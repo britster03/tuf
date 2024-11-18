@@ -1,0 +1,76 @@
+# PlayFairCipher Implementation 
+
+## Author
+*Name:* Ronit Chandresh Virwani (B01099810)
+*Email:* rvirwani@binghamton.edu
+
+## Programming Language
+- *Language Used:* Java
+
+## Testing Environment
+- *Tested On:* Yes, the code was tested on `remote.cs.binghamton.edu`.
+
+## How to Compile and Execute
+
+### Compilation
+1. Open your terminal or command prompt.
+2. Navigate to the directory containing the PlayFairCipher10.java file.
+3. Compile the Java source file using the javac compiler:
+`javac PlayFairCipher10.java`
+A PlayFairCipher10.class file will be created.
+
+### Execution
+
+The program requires two command-line arguments:
+
+1. Keyword: A string used to generate the cipher matrix.
+2. Mode:
+`1 for encryption`
+`0 for decryption`
+
+**Encrypting Text:**
+To encrypt plaintext, use the following command structure:
+
+`java PlayFairCipher10 <keyword> 1`
+
+Example : `java PlayFairCipher10 commom 1`
+
+
+Input: The program will prompt you to enter the plaintext.
+Output: It will display the formatted text and the resulting encrypted ciphertext.
+
+**Decrypting Text:**
+
+To decrypt plaintext, use the following command structure:
+
+`java PlayFairCipher10 <keyword> 0`
+
+Example : `java PlayFairCipher10 commom 0`
+
+Input: The program will prompt you to enter the ciphertext.
+Output: It will display the formatted text and the resulting decrypted plaintext without any padding characters.
+
+### Using the Makefile
+
+1. Compile the Program using: `make`
+This command compiles the PlayFairCipher10.java file and generates the corresponding .class file.
+
+2. Run the Program using:
+
+Encryption Mode (1): `make run ARG1=<keyword> ARG2=1`
+
+Example : `make run ARG1=commom ARG2=1`
+
+Decryption Mode (0): `make run ARG1=<keyword> ARG2=0`
+
+Example : `make run ARG1=commom ARG2=0`
+
+3. Clean up compiled files: `make clean`
+
+This command removes all compiled .class files from the directory.
+
+### Prerequisites
+- **Java Development Kit (JDK):** Ensure that JDK is installed on your system. You can verify the installation by running:
+  ```bash
+  javac -version
+  java -version
