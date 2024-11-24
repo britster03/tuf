@@ -1,0 +1,11 @@
+Satisfied
+v1 = false
+v2 = false
+v3 = true
+v4 = true
+v5 = true
+v6 = false
+v7 = false
+v8 = false
+v9 = false
+v10 = false

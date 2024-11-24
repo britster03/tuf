@@ -1,3 +1,13 @@
+/*
+ * 
+ * Title :- Implementation of 3CNF Satisfiability.
+ * 
+ * Name : Ronit Chandresh Virwani (B01099810)
+ * Date: 11-24-2024
+ 
+ */
+
+
 import java.util.*;
 import java.io.*;
 
@@ -5,11 +15,11 @@ public class SATSolver {
     public static void main(String[] args) throws IOException {
         Scanner sc = new Scanner(System.in);
         
-        // read number of variables and clauses
+        // reading the number of variables and clauses
         int numVars = sc.nextInt();
         int numClauses = sc.nextInt();
         
-        // read clauses
+        // first we will read all the clauses
         List<List<Integer>> clauses = new ArrayList<>();
         for(int i = 0; i < numClauses; i++) {
             List<Integer> clause = new ArrayList<>();
@@ -19,15 +29,15 @@ public class SATSolver {
             clauses.add(clause);
         }
         
-        // initialize assignments array: index 1..numVars, 0 unused
-        // 1 = true, -1 = false, 0 = unassigned
+        // here we will initialize a assignments array 
+        // here 1 represents true, -1 represents false, 0 represents unassigned
         int[] assignments = new int[numVars + 1];
         
-        // attempt to solve using DPLL
+        // the aim to solve it using the recommeded idea of Davis-Putnam-Logemann-Loveland (DPLL) algorithm
         boolean satisfiable = dpll(clauses, assignments, numVars);
         
         if(satisfiable) {
-            // if satisfiable, print assignments
+            // if satisfiable, we will print the assignments
             System.out.println("Satisfied");
             for(int i = 1; i <= numVars; i++) {
                 if(assignments[i] == 1) {
@@ -39,17 +49,18 @@ public class SATSolver {
             }
         }
         else {
-            // if not satisfiable, print Unsatisfiable
+            // if not satisfiable, we will print0 "Unsatisfiable"
             System.out.println("Unsatisfiable.");
         }
     }
     
-    // dpll recursive algorithm
+    // implementing dpll recursive algorithm
+    // we will pass the list of clauses in cnf, current var asgts, total num of vars
     private static boolean dpll(List<List<Integer>> clauses, int[] assignments, int numVars) {
-        // simplify clauses based on current assignments
+        // first we will simplify clauses based on current assignments
         List<List<Integer>> simplified = simplifyClauses(clauses, assignments);
-        
-        // if all clauses are satisfied
+        // we will keep in mind some conditions here,
+        // if no clauses, all are satisfied
         if(simplified.isEmpty()) {
             return true;
         }
@@ -61,7 +72,7 @@ public class SATSolver {
             }
         }
         
-        // pure literal elimination
+        // we will find some pure literals
         Integer pureLiteral = findPureLiteral(simplified, numVars);
         if(pureLiteral != null) {
             int var = Math.abs(pureLiteral);
@@ -70,7 +81,7 @@ public class SATSolver {
             return dpll(simplified, assignments, numVars);
         }
         
-        // unit clause elimination
+        // here we will find some unit clauses
         Integer unitLiteral = findUnitClause(simplified);
         if(unitLiteral != null) {
             int var = Math.abs(unitLiteral);
@@ -79,79 +90,90 @@ public class SATSolver {
             return dpll(simplified, assignments, numVars);
         }
         
-        // choose the next variable to assign (lowest index first)
+        // then we will choose the next variable to assign (lowest index will be assigned first)
         int varToAssign = chooseVariable(simplified, assignments, numVars);
         if(varToAssign == -1) {
-            // no variable left to assign but clauses not satisfied
+            // we will return false if no variable is left to assign but still the clauses are not satisfied
             return false;
         }
         
-        // try assigning true first
+        // we will try assigning true first
         int[] copyAssignTrue = assignments.clone();
         copyAssignTrue[varToAssign] = 1;
         boolean resultTrue = dpll(simplified, copyAssignTrue, numVars);
         if(resultTrue) {
-            // copy successful assignments back
+            // if assigning true leads to a solution, we will update the assignments
             System.arraycopy(copyAssignTrue, 0, assignments, 0, copyAssignTrue.length);
             return true;
         }
         
-        // if true doesn't work, try assigning false
+        // if assigning true doesn't work above ,we will try assigning false
         int[] copyAssignFalse = assignments.clone();
         copyAssignFalse[varToAssign] = -1;
         boolean resultFalse = dpll(simplified, copyAssignFalse, numVars);
         if(resultFalse) {
-            // copy successful assignments back
+            // if assigning false leads to a solution, we will update the assignments
             System.arraycopy(copyAssignFalse, 0, assignments, 0, copyAssignFalse.length);
             return true;
         }
         
-        // neither true nor false leads to a solution
+        // return false if neither true nor false leads to a solution
         return false;
     }
     
-    // method to simplify clauses based on current assignments
+    // this method simplifies clauses based on current assignments
+    // it basically removes clauses that are already satisfied and also removes the falsified literals
     private static List<List<Integer>> simplifyClauses(List<List<Integer>> clauses, int[] assignments) {
         List<List<Integer>> simplified = new ArrayList<>();
+
         for(List<Integer> clause : clauses) {
-            boolean satisfied = false;
+            boolean clauseSatisfied = false;
             List<Integer> newClause = new ArrayList<>();
+
             for(Integer literal : clause) {
                 int var = Math.abs(literal);
-                if(assignments[var] == 0) {
+                int value = assignments[var];
+
+                if(value == 0) {
+                    // if the variable is unassigned, we will keep the literal
                     newClause.add(literal);
-                }
-                else {
-                    if((literal > 0 && assignments[var] == 1) ||
-                       (literal < 0 && assignments[var] == -1)) {
-                        // clause is satisfied
-                        satisfied = true;
+                } else {
+                    if((literal > 0 && value == 1) || (literal < 0 && value == -1)) {
+                        // if the clause is satisfied by this literal
+                        clauseSatisfied = true;
                         break;
                     }
+                    // else, the literal is falsified, and it is not added to newClause
                 }
             }
-            if(!satisfied) {
+
+            if(!clauseSatisfied) {
                 simplified.add(newClause);
             }
         }
+
         return simplified;
     }
     
-    // method to find a pure literal
+    // here we wilo try to find a pure literal
+    // a pure literal appears with only one polarity either all positive or all negative
     private static Integer findPureLiteral(List<List<Integer>> clauses, int numVars) {
         boolean[] pos = new boolean[numVars +1];
         boolean[] neg = new boolean[numVars +1];
+        
         for(List<Integer> clause : clauses) {
             for(Integer literal : clause) {
                 int var = Math.abs(literal);
-                if(literal >0) {
+                if(literal > 0) {
                     pos[var] = true;
                 } else {
                     neg[var] = true;
                 }
             }
         }
-        for(int i=1;i<=numVars;i++) {
+
+        // identifying pure literals
+        for(int i = 1; i <= numVars; i++) {
             if(pos[i] && !neg[i]) {
                 return i; // pure positive literal
             }
@@ -162,7 +184,7 @@ public class SATSolver {
         return null;
     }
     
-    // method to find a unit clause
+    // here we will try to find a unit clause in the clauses, a unit clause has only one unassigned literal
     private static Integer findUnitClause(List<List<Integer>> clauses) {
         for(List<Integer> clause : clauses) {
             if(clause.size() == 1) {
@@ -172,14 +194,14 @@ public class SATSolver {
         return null;
     }
     
-    // method to choose the next variable to assign
+    // and finally a method to choose the next variable to assign
+    // it selects the first unassigned variable based on ascending order
     private static int chooseVariable(List<List<Integer>> clauses, int[] assignments, int numVars) {
-        // choose the first unassigned variable (lowest index first)
         for(int i = 1; i <= numVars; i++) {
             if(assignments[i] == 0) {
                 return i;
             }
         }
-        return -1;
+        return -1; // indicator that all vars are assigned
     }
 }
